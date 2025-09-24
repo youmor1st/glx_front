@@ -1,1 +1,0 @@
-type TokensSegmentControlType = "roi" | "profit";

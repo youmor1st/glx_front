@@ -70,8 +70,7 @@ export function App() {
 
           <Section style={{ marginTop: 16, background: "#121129", borderRadius: 12 }}>
             <p style={{ margin: 0, color: "#9EA0C8" }}>
-              Экран адаптирован под мобильный размер. На десктопе отображается та же
-              мобильная ширина.
+              Soon project will be updated
             </p>
           </Section>
         </div>

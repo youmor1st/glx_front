@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
 import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 
-import { Root } from "@/app/Root.tsx";
+import { App } from "@/app/App.tsx";
 import { EnvUnsupported } from "@/app/EnvUnsupported.tsx";
 import { init } from "@/init.ts";
 
@@ -15,20 +15,13 @@ import { Helmet } from "react-helmet";
 // Mock the environment in case, we are outside Telegram.
 import "../envs/mockEnv.ts";
 
-import { AuthProvider } from "./features/auth/use-auth.tsx";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./shared/lib/utils.ts";
-
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 try {
   const launchParams = retrieveLaunchParams();
   const { tgWebAppPlatform: platform } = launchParams;
-  const debug =
-    (launchParams.tgWebAppStartParam || "").includes("platformer_debug") ||
-    import.meta.env.DEV;
+  const debug = (launchParams.tgWebAppStartParam || "").includes("platformer_debug") || import.meta.env.DEV;
 
-  // Configure all application dependencies.
   await init({
     debug,
     eruda: debug && ["ios", "android"].includes(platform),
@@ -42,11 +35,7 @@ try {
             content="width=device-width, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0, maximum-scale=1.0"
           />
         </Helmet>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <Root />
-          </AuthProvider>
-        </QueryClientProvider>
+        <App />
       </StrictMode>
     );
   });

@@ -13,7 +13,7 @@ export function HomePage({ onAdminRegistration, onLogin }: HomePageProps) {
           Система баллов
         </h1>
         <p style={{ color: '#C7C7F0', fontSize: '16px', lineHeight: '1.5' }}>
-          Добро пожаловать в систему управления баллами для студентов
+          Добро пожаловать в систему управленdfydия баллами для студентов
         </p>
       </div>
 

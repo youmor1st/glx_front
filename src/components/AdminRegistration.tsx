@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Button, Input, Text } from '@telegram-apps/telegram-ui';
 import { authAPI } from '@/services/api';
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
-
+п
 const adminSchema = z.object({
   username: z.string().min(3, 'Имя пользователя должно содержать минимум 3 символа'),
   password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),

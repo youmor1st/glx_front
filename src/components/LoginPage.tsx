@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Input, Text, Cell } from '@telegram-apps/telegram-ui';
+import { Button, Input, Text } from '@telegram-apps/telegram-ui';
 import { useAuthStore } from '@/store/authStore';
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
@@ -33,10 +33,10 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
   useEffect(() => {
     // Check if we're in Telegram environment
     const launchParams = retrieveLaunchParams();
-    const isInTelegram = launchParams.tgWebAppData && launchParams.tgWebAppData.length > 0;
-    setIsTelegramAvailable(isInTelegram);
+    const isInTelegram = launchParams.tgWebAppData && typeof launchParams.tgWebAppData === 'string' && (launchParams.tgWebAppData as string).length > 0;
+    setIsTelegramAvailable(!!isInTelegram);
 
-    if (isInTelegram) {
+    if (isInTelegram && typeof launchParams.tgWebAppData === 'string') {
       try {
         // Parse Telegram user data from init data
         const urlParams = new URLSearchParams(launchParams.tgWebAppData);
@@ -67,19 +67,22 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
     try {
       clearError();
       const launchParams = retrieveLaunchParams();
-      const urlParams = new URLSearchParams(launchParams.tgWebAppData);
       
-      const telegramData = {
-        id: telegramUser.id,
-        first_name: telegramUser.first_name,
-        last_name: telegramUser.last_name || '',
-        username: telegramUser.username || '',
-        auth_date: parseInt(urlParams.get('auth_date') || '0'),
-        hash: urlParams.get('hash') || '',
-      };
+      if (typeof launchParams.tgWebAppData === 'string') {
+        const urlParams = new URLSearchParams(launchParams.tgWebAppData);
+        
+        const telegramData = {
+          id: telegramUser.id,
+          first_name: telegramUser.first_name,
+          last_name: telegramUser.last_name || '',
+          username: telegramUser.username || '',
+          auth_date: parseInt(urlParams.get('auth_date') || '0'),
+          hash: urlParams.get('hash') || '',
+        };
 
-      await login(telegramData.username, 'telegram_auth');
-      onSuccess();
+        await login(telegramData.username, 'telegram_auth');
+        onSuccess();
+      }
     } catch (error) {
       // Error is handled by the store
     }

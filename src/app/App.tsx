@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { AppRoot } from "@telegram-apps/telegram-ui";
-import { isMiniAppDark, retrieveLaunchParams, useSignal, postEvent } from "@telegram-apps/sdk-react";
+import { isMiniAppDark, retrieveLaunchParams, useSignal } from "@telegram-apps/sdk-react";
 import { useAuthStore } from "@/store/authStore";
 import { LoginPage } from "@/components/LoginPage";
 import { StudentDashboard } from "@/components/StudentDashboard";
@@ -8,7 +8,7 @@ import { StudentDashboard } from "@/components/StudentDashboard";
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
   const isDark = useSignal(isMiniAppDark);
-  const { isAuthenticated, isLoading, checkAuth, user } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Section, Title, Text, Cell } from '@telegram-apps/telegram-ui';
+import { Button, Section, Title, Text } from '@telegram-apps/telegram-ui';
 import { useAuthStore } from '@/store/authStore';
 import { studentsAPI, type PointHistory } from '@/services/api';
 

@@ -90,7 +90,7 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <h1 style={{ color: '#FFFFFF', marginBottom: '8px' }}>Вход в систему</h1>
         <p style={{ color: '#C7C7F0', fontSize: '14px' }}>
-          Войдите в свой аккаунт для доступа к системе баллов
+          Войдите в свой аккаунт для доступа к системе баллов asdasdasd
         </p>
       </div>
 

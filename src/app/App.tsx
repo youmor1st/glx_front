@@ -2,14 +2,19 @@ import { useMemo, useEffect, useState } from "react";
 import { AppRoot } from "@telegram-apps/telegram-ui";
 import { isMiniAppDark, retrieveLaunchParams, useSignal } from "@telegram-apps/sdk-react";
 import { useAuthStore } from "@/store/authStore";
+import { HomePage } from "@/components/HomePage";
+import { AdminRegistration } from "@/components/AdminRegistration";
 import { LoginPage } from "@/components/LoginPage";
 import { StudentDashboard } from "@/components/StudentDashboard";
+
+type AppPage = 'home' | 'admin-registration' | 'login' | 'dashboard';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
   const isDark = useSignal(isMiniAppDark);
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentPage, setCurrentPage] = useState<AppPage>('home');
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -20,8 +25,35 @@ export function App() {
     initializeAuth();
   }, [checkAuth]);
 
+  // Update current page based on authentication status
+  useEffect(() => {
+    if (isInitialized) {
+      if (isAuthenticated) {
+        setCurrentPage('dashboard');
+      } else {
+        setCurrentPage('home');
+      }
+    }
+  }, [isAuthenticated, isInitialized]);
+
+  const handleAdminRegistration = () => {
+    setCurrentPage('admin-registration');
+  };
+
+  const handleLogin = () => {
+    setCurrentPage('login');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+  };
+
   const handleLoginSuccess = () => {
-    // Login success is handled by the store
+    setCurrentPage('dashboard');
+  };
+
+  const handleAdminRegistrationSuccess = () => {
+    setCurrentPage('login');
   };
 
   if (!isInitialized || isLoading) {
@@ -84,10 +116,23 @@ export function App() {
             flexDirection: "column",
           }}
         >
-          {isAuthenticated ? (
-            <StudentDashboard />
-          ) : (
+          {currentPage === 'home' && (
+            <HomePage 
+              onAdminRegistration={handleAdminRegistration}
+              onLogin={handleLogin}
+            />
+          )}
+          {currentPage === 'admin-registration' && (
+            <AdminRegistration 
+              onSuccess={handleAdminRegistrationSuccess}
+              onBackToLogin={handleBackToHome}
+            />
+          )}
+          {currentPage === 'login' && (
             <LoginPage onSuccess={handleLoginSuccess} />
+          )}
+          {currentPage === 'dashboard' && (
+            <StudentDashboard />
           )}
         </div>
       </div>

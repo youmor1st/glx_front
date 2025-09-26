@@ -127,13 +127,13 @@ export const authAPI = {
 
   // Register admin
   registerAdmin: async (adminData: AdminCreate): Promise<AdminOut> => {
-    const response = await api.post('/admin/register', adminData);
+    const response = await api.post('/register', adminData);
     return response.data;
   },
 
   // Check username availability
   checkUsernameAvailability: async (username: string): Promise<UsernameCheckResponse> => {
-    const response = await api.get(`/admin/check-username/${username}`);
+    const response = await api.get(`/check-username/${username}`);
     return response.data;
   },
 };

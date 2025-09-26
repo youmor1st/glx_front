@@ -7,6 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  telegramId: number | null;
   
   // Actions
   login: (username: string, password: string) => Promise<void>;
@@ -17,6 +18,7 @@ interface AuthState {
   setError: (error: string | null) => void;
   clearError: () => void;
   checkAuth: () => Promise<void>;
+  setTelegramId: (id: number | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      telegramId: null,
 
       login: async (username: string, password: string) => {
         set({ isLoading: true, error: null });
@@ -69,6 +72,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
             error: null,
+            telegramId: telegramData.id,
           });
         } catch (error: any) {
           set({
@@ -86,6 +90,7 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           isAuthenticated: false,
           error: null,
+          telegramId: null,
         });
       },
 
@@ -103,6 +108,10 @@ export const useAuthStore = create<AuthState>()(
 
       clearError: () => {
         set({ error: null });
+      },
+
+      setTelegramId: (id: number | null) => {
+        set({ telegramId: id });
       },
 
       checkAuth: async () => {

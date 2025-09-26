@@ -6,24 +6,53 @@ import { HomePage } from "@/components/HomePage";
 import { AdminRegistration } from "@/components/AdminRegistration";
 import { LoginPage } from "@/components/LoginPage";
 import { StudentDashboard } from "@/components/StudentDashboard";
+import { AdminDashboard } from "@/components/AdminDashboard";
 
 type AppPage = 'home' | 'admin-registration' | 'login' | 'dashboard';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
   const isDark = useSignal(isMiniAppDark);
-  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth, user, setTelegramId, telegramLogin } = useAuthStore();
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentPage, setCurrentPage] = useState<AppPage>('home');
 
   useEffect(() => {
     const initializeAuth = async () => {
+      // First check if user is already authenticated
       await checkAuth();
+      
+      // If not authenticated, try Telegram login
+      if (!isAuthenticated) {
+        const launchParams = retrieveLaunchParams();
+        const isInTelegram = launchParams.tgWebAppData && typeof launchParams.tgWebAppData === 'string' && (launchParams.tgWebAppData as string).length > 0;
+        
+        if (isInTelegram && typeof launchParams.tgWebAppData === 'string') {
+          try {
+            const urlParams = new URLSearchParams(launchParams.tgWebAppData);
+            const userParam = urlParams.get('user');
+            if (userParam) {
+              const telegramUser = JSON.parse(userParam);
+              setTelegramId(telegramUser.id);
+              
+              // Try to login with Telegram
+              try {
+                await telegramLogin(telegramUser);
+              } catch (error) {
+                console.log('Telegram login failed, user needs to register or login manually');
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing Telegram user data:', error);
+          }
+        }
+      }
+      
       setIsInitialized(true);
     };
     
     initializeAuth();
-  }, [checkAuth]);
+  }, [checkAuth, isAuthenticated, setTelegramId, telegramLogin]);
 
   // Update current page based on authentication status
   useEffect(() => {
@@ -132,7 +161,7 @@ export function App() {
             <LoginPage onSuccess={handleLoginSuccess} />
           )}
           {currentPage === 'dashboard' && (
-            <StudentDashboard />
+            user?.role === 'admin' ? <AdminDashboard /> : <StudentDashboard />
           )}
         </div>
       </div>

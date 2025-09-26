@@ -126,14 +126,18 @@ export const authAPI = {
   },
 
   // Register admin
-  registerAdmin: async (adminData: AdminCreate): Promise<AdminOut> => {
-    const response = await api.post('/admin_registration/register', adminData);
+ registerAdmin: async (adminData: AdminCreate): Promise<AdminOut> => {
+    console.log('Registering admin with data:', adminData);
+    console.log('Full URL:', `${API_BASE_URL}/admin-registration/register`);
+    const response = await api.post('/admin-registration/register', adminData);
     return response.data;
   },
 
   // Check username availability
   checkUsernameAvailability: async (username: string): Promise<UsernameCheckResponse> => {
-    const response = await api.get(`/admin_registration/check-username/${username}`);
+    console.log('Checking username availability:', username);
+    console.log('Full URL:', `${API_BASE_URL}/admin-registration/check-username/${username}`);
+    const response = await api.get(`/admin-registration/check-username/${username}`);
     return response.data;
   },
 };

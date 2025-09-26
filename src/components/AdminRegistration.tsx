@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Text } from '@telegram-apps/telegram-ui';
 import { authAPI } from '@/services/api';
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 const adminSchema = z.object({
   username: z.string().min(3, 'Имя пользователя должно содержать минимум 3 символа'),
   password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
   first_name: z.string().min(1, 'Имя обязательно'),
   last_name: z.string().optional(),
+  telegram_id: z.number().optional().nullable(),
 });
 
 type AdminFormData = z.infer<typeof adminSchema>;
@@ -23,6 +25,7 @@ export function AdminRegistration({ onSuccess, onBackToLogin }: AdminRegistratio
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usernameCheck, setUsernameCheck] = useState<{ available: boolean; message: string } | null>(null);
+  const [telegramUser, setTelegramUser] = useState<any>(null);
 
   const {
     register,
@@ -34,6 +37,24 @@ export function AdminRegistration({ onSuccess, onBackToLogin }: AdminRegistratio
   });
 
   const username = watch('username');
+
+  useEffect(() => {
+    const launchParams = retrieveLaunchParams();
+    const isInTelegram = launchParams.tgWebAppData && typeof launchParams.tgWebAppData === 'string' && (launchParams.tgWebAppData as string).length > 0;
+
+    if (isInTelegram && typeof launchParams.tgWebAppData === 'string') {
+      try {
+        const urlParams = new URLSearchParams(launchParams.tgWebAppData);
+        const userParam = urlParams.get('user');
+        if (userParam) {
+          const user = JSON.parse(userParam);
+          setTelegramUser(user);
+        }
+      } catch (error) {
+        console.error('Error parsing Telegram user data:', error);
+      }
+    }
+  }, []);
 
   const checkUsernameAvailability = async () => {
     if (!username || username.length < 3) return;
@@ -51,7 +72,13 @@ export function AdminRegistration({ onSuccess, onBackToLogin }: AdminRegistratio
     setError(null);
 
     try {
-      await authAPI.registerAdmin(data);
+      // Include Telegram ID if available
+      const adminData = {
+        ...data,
+        telegram_id: telegramUser?.id || null,
+      };
+      
+      await authAPI.registerAdmin(adminData);
       onSuccess();
     } catch (error: any) {
       setError(error.response?.data?.detail || 'Ошибка при регистрации админа');
@@ -67,6 +94,22 @@ export function AdminRegistration({ onSuccess, onBackToLogin }: AdminRegistratio
         <p style={{ color: '#C7C7F0', fontSize: '14px' }}>
           Создайте аккаунт администратора для управления системой
         </p>
+        {telegramUser && (
+          <div style={{
+            background: 'rgba(0, 122, 255, 0.1)',
+            border: '1px solid #007AFF',
+            borderRadius: '8px',
+            padding: '12px',
+            marginTop: '16px'
+          }}>
+            <Text style={{ color: '#007AFF', fontSize: '14px', fontWeight: '600' }}>
+              Telegram ID: {telegramUser.id}
+            </Text>
+            <Text style={{ color: '#C7C7F0', fontSize: '12px', marginTop: '4px' }}>
+              {telegramUser.first_name} {telegramUser.last_name || ''}
+            </Text>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

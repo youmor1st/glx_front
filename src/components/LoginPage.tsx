@@ -91,9 +91,9 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <h1 style={{ color: '#FFFFFF', marginBottom: '8px' }}>Вход в систему</h1>
+        <h1 style={{ color: '#FFFFFF', marginBottom: '8px' }}>Вход в ewqeсистему</h1>
         <p style={{ color: '#C7C7F0', fontSize: '14px' }}>
-          Войдите в свой аккаунт для доступа к системе баллов asdasdasd
+          Войдите в свой аккаунт для доступа к системе баллов asdd
         </p>
       </div>
 

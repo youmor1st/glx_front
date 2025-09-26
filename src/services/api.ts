@@ -23,7 +23,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -68,6 +67,27 @@ export interface User {
   status?: string;
 }
 
+export interface AdminCreate {
+  username: string;
+  password: string;
+  first_name: string;
+  last_name?: string;
+}
+
+export interface AdminOut {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name?: string;
+  telegram_id?: number;
+}
+
+export interface UsernameCheckResponse {
+  username: string;
+  available: boolean;
+  message: string;
+}
+
 export interface PointHistory {
   id: number;
   points_changed: number;
@@ -100,6 +120,18 @@ export const authAPI = {
   // Get current user info
   getCurrentUser: async (): Promise<User> => {
     const response = await api.get('/auth/me');
+    return response.data;
+  },
+
+  // Register admin
+  registerAdmin: async (adminData: AdminCreate): Promise<AdminOut> => {
+    const response = await api.post('/admin/register', adminData);
+    return response.data;
+  },
+
+  // Check username availability
+  checkUsernameAvailability: async (username: string): Promise<UsernameCheckResponse> => {
+    const response = await api.get(`/admin/check-username/${username}`);
     return response.data;
   },
 };

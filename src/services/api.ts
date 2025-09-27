@@ -203,4 +203,34 @@ export const teachersAPI = {
   },
 };
 
+export const adminAPI = {
+  // Get all students (admin view)
+  getAllStudents: async (): Promise<User[]> => {
+    const response = await api.get('/admin/students');
+    return response.data;
+  },
+
+  // Get all point history (admin view)
+  getAllPointHistory: async (): Promise<PointHistory[]> => {
+    const response = await api.get('/admin/point-history');
+    return response.data;
+  },
+
+  // Get leaderboard (admin view)
+  getLeaderboard: async (): Promise<User[]> => {
+    const response = await api.get('/admin/leaderboard');
+    return response.data;
+  },
+
+  // Get statistics
+  getStatistics: async (): Promise<{
+    total_students: number;
+    total_points: number;
+    active_students: number;
+  }> => {
+    const response = await api.get('/admin/statistics');
+    return response.data;
+  },
+};
+
 export default api;

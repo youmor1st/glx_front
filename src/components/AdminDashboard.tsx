@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Section, Title, Text } from '@telegram-apps/telegram-ui';
 import { useAuthStore } from '@/store/authStore';
-import { studentsAPI, type PointHistory } from '@/services/api';
+import { adminAPI, type PointHistory } from '@/services/api';
 
 export function AdminDashboard() {
   const { user, logout } = useAuthStore();
@@ -17,8 +17,8 @@ export function AdminDashboard() {
     setIsLoading(true);
     try {
       const [historyData, leaderboardData] = await Promise.all([
-        studentsAPI.getHistory(),
-        studentsAPI.getLeaderboard()
+        adminAPI.getAllPointHistory(),
+        adminAPI.getLeaderboard()
       ]);
       setPointHistory(historyData);
       setLeaderboard(leaderboardData);

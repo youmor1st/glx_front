@@ -160,7 +160,21 @@ export const authAPI = {
         
         // Also add telegram_id to form data
         formData.append('telegram_id', telegramId.toString());
+      } else {
+        // If telegram_id extraction failed, add null values
+        console.log('🔍 API - Failed to extract telegram_id, adding null values');
+        headers['X-Telegram-User-Id'] = 'null';
+        headers['telegram_id'] = 'null';
+        headers['X-Telegram-ID'] = 'null';
+        formData.append('telegram_id', 'null');
       }
+    } else {
+      // If no Telegram data, add null telegram_id to satisfy server requirements
+      console.log('🔍 API - No Telegram data, adding null telegram_id');
+      headers['X-Telegram-User-Id'] = 'null';
+      headers['telegram_id'] = 'null';
+      headers['X-Telegram-ID'] = 'null';
+      formData.append('telegram_id', 'null');
     }
     
     console.log('🔍 API - Headers being sent:', headers);

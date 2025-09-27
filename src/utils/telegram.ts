@@ -132,6 +132,8 @@ export function isTelegramWebApp(): boolean {
  */
 export function getTelegramInitData(): string | null {
   const webApp = getTelegramWebApp();
+  console.log('🔍 getTelegramInitData - webApp:', webApp);
+  console.log('🔍 getTelegramInitData - initData:', webApp?.initData);
   return webApp?.initData || null;
 }
 
@@ -156,10 +158,15 @@ export function getTelegramUserId(): number | null {
  */
 export function extractTelegramIdFromInitData(initData: string): number | null {
   try {
+    console.log('🔍 extractTelegramIdFromInitData - input:', initData);
     const urlParams = new URLSearchParams(initData);
+    console.log('🔍 extractTelegramIdFromInitData - urlParams:', urlParams);
     const userParam = urlParams.get('user');
+    console.log('🔍 extractTelegramIdFromInitData - userParam:', userParam);
+    
     if (userParam) {
       const user = JSON.parse(userParam);
+      console.log('🔍 extractTelegramIdFromInitData - parsed user:', user);
       return user.id || null;
     }
   } catch (error) {

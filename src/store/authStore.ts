@@ -39,6 +39,8 @@ export const useAuthStore = create<AuthState>()(
         try {
           // Get Telegram Init Data if available
           const telegramInitData = getTelegramInitData();
+          console.log('🔍 Telegram Init Data:', telegramInitData);
+          console.log('🔍 Is Telegram WebApp available:', isTelegramWebApp());
           
           const response: AuthResponse = await authAPI.loginForm(
             { username, password },

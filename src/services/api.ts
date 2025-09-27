@@ -144,15 +144,22 @@ export const authAPI = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
     
+    console.log('🔍 API - Telegram Init Data received:', telegramInitData);
+    
     if (telegramInitData) {
       headers['X-Telegram-Init-Data'] = telegramInitData;
       
       // Extract telegram_id from init data and add it to headers
       const telegramId = extractTelegramIdFromInitData(telegramInitData);
+      console.log('🔍 API - Extracted Telegram ID:', telegramId);
+      
       if (telegramId) {
         headers['X-Telegram-User-Id'] = telegramId.toString();
       }
     }
+    
+    console.log('🔍 API - Headers being sent:', headers);
+    console.log('🔍 API - Form data being sent:', formData.toString());
     
     const response = await api.post('/auth/login', formData, { headers });
     return response.data;

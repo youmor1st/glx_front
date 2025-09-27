@@ -7,44 +7,34 @@ import { AdminRegistration } from "@/components/AdminRegistration";
 import { LoginPage } from "@/components/LoginPage";
 import { StudentDashboard } from "@/components/StudentDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { isTelegramWebApp, initTelegramWebApp } from "@/utils/telegram";
 
 type AppPage = 'home' | 'admin-registration' | 'login' | 'dashboard';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
   const isDark = useSignal(isMiniAppDark);
-  const { isAuthenticated, isLoading, checkAuth, user, setTelegramId, telegramLogin } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth, user, telegramLogin, checkTelegramAvailability } = useAuthStore();
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentPage, setCurrentPage] = useState<AppPage>('home');
 
   useEffect(() => {
     const initializeAuth = async () => {
+      // Initialize Telegram WebApp
+      initTelegramWebApp();
+      
+      // Check Telegram availability
+      checkTelegramAvailability();
+      
       // First check if user is already authenticated
       await checkAuth();
       
       // If not authenticated, try Telegram login
-      if (!isAuthenticated) {
-        const launchParams = retrieveLaunchParams();
-        const isInTelegram = launchParams.tgWebAppData && typeof launchParams.tgWebAppData === 'string' && (launchParams.tgWebAppData as string).length > 0;
-        
-        if (isInTelegram && typeof launchParams.tgWebAppData === 'string') {
-          try {
-            const urlParams = new URLSearchParams(launchParams.tgWebAppData);
-            const userParam = urlParams.get('user');
-            if (userParam) {
-              const telegramUser = JSON.parse(userParam);
-              setTelegramId(telegramUser.id);
-              
-              // Try to login with Telegram
-              try {
-                await telegramLogin();
-              } catch (error) {
-                console.log('Telegram login failed, user needs to register or login manually');
-              }
-            }
-          } catch (error) {
-            console.error('Error parsing Telegram user data:', error);
-          }
+      if (!isAuthenticated && isTelegramWebApp()) {
+        try {
+          await telegramLogin();
+        } catch (error) {
+          console.log('Telegram login failed, user needs to register or login manually');
         }
       }
       
@@ -52,7 +42,7 @@ export function App() {
     };
     
     initializeAuth();
-  }, [checkAuth, isAuthenticated, setTelegramId, telegramLogin]);
+  }, [checkAuth, isAuthenticated, telegramLogin, checkTelegramAvailability]);
 
   // Update current page based on authentication status
   useEffect(() => {

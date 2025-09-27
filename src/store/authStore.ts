@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
           // Get Telegram Init Data if available
           const telegramInitData = getTelegramInitData();
           
-          const response: AuthResponse = await authAPI.login(
+          const response: AuthResponse = await authAPI.loginForm(
             { username, password },
             telegramInitData || undefined
           );

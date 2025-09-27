@@ -54,6 +54,12 @@ export interface AuthResponse {
   access_token: string;
   token_type: string;
   role: string;
+  user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  telegram_id: number;
+  telegram_linked: boolean;
 }
 
 export interface User {
@@ -99,23 +105,43 @@ export interface PointHistory {
 }
 
 export const authAPI = {
-  // Login with username and password
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const formData = new URLSearchParams();
-    formData.append('username', credentials.username);
-    formData.append('password', credentials.password);
+  // First login with username and password (binds Telegram ID)
+  login: async (credentials: LoginCredentials, telegramInitData?: string): Promise<AuthResponse> => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
     
-    const response = await api.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    if (telegramInitData) {
+      headers['X-Telegram-Init-Data'] = telegramInitData;
+    }
+    
+    const response = await api.post('/auth/login', credentials, { headers });
+    return response.data;
+  },
+
+  // Quick login with Telegram Init Data only
+  telegramLogin: async (initData: string): Promise<AuthResponse> => {
+    const response = await api.post('/auth/telegram-login', {
+      init_data: initData
     });
     return response.data;
   },
 
-  // Login with Telegram data
-  telegramLogin: async (telegramData: TelegramLoginData): Promise<AuthResponse> => {
-    const response = await api.post('/auth/telegram-login', telegramData);
+  // Alternative login with form data (for backward compatibility)
+  loginForm: async (credentials: LoginCredentials, telegramInitData?: string): Promise<AuthResponse> => {
+    const formData = new URLSearchParams();
+    formData.append('username', credentials.username);
+    formData.append('password', credentials.password);
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    
+    if (telegramInitData) {
+      headers['X-Telegram-Init-Data'] = telegramInitData;
+    }
+    
+    const response = await api.post('/auth/login', formData, { headers });
     return response.data;
   },
 

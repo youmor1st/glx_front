@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authAPI, type User, type AuthResponse } from '@/services/api';
+import { getTelegramInitData, isTelegramWebApp } from '@/utils/telegram';
 
 interface AuthState {
   user: User | null;
@@ -8,10 +9,11 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   telegramId: number | null;
+  isTelegramAvailable: boolean;
   
   // Actions
   login: (username: string, password: string) => Promise<void>;
-  telegramLogin: (telegramData: any) => Promise<void>;
+  telegramLogin: () => Promise<void>;
   logout: () => void;
   setUser: (user: User) => void;
   setLoading: (loading: boolean) => void;
@@ -19,6 +21,7 @@ interface AuthState {
   clearError: () => void;
   checkAuth: () => Promise<void>;
   setTelegramId: (id: number | null) => void;
+  checkTelegramAvailability: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -29,23 +32,38 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
       telegramId: null,
+      isTelegramAvailable: false,
 
       login: async (username: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response: AuthResponse = await authAPI.login({ username, password });
+          // Get Telegram Init Data if available
+          const telegramInitData = getTelegramInitData();
+          
+          const response: AuthResponse = await authAPI.login(
+            { username, password },
+            telegramInitData || undefined
+          );
           
           // Store token
           localStorage.setItem('access_token', response.access_token);
           
-          // Get user data
-          const user = await authAPI.getCurrentUser();
+          // Create user object from response
+          const user: User = {
+            id: response.user_id,
+            username: response.username,
+            first_name: response.first_name,
+            last_name: response.last_name,
+            telegram_id: response.telegram_id,
+            role: response.role,
+          };
           
           set({
             user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
+            telegramId: response.telegram_id,
           });
         } catch (error: any) {
           set({
@@ -56,23 +74,35 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      telegramLogin: async (telegramData: any) => {
+      telegramLogin: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response: AuthResponse = await authAPI.telegramLogin(telegramData);
+          const initData = getTelegramInitData();
+          if (!initData) {
+            throw new Error('Telegram Init Data не доступен');
+          }
+          
+          const response: AuthResponse = await authAPI.telegramLogin(initData);
           
           // Store token
           localStorage.setItem('access_token', response.access_token);
           
-          // Get user data
-          const user = await authAPI.getCurrentUser();
+          // Create user object from response
+          const user: User = {
+            id: response.user_id,
+            username: response.username,
+            first_name: response.first_name,
+            last_name: response.last_name,
+            telegram_id: response.telegram_id,
+            role: response.role,
+          };
           
           set({
             user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            telegramId: telegramData.id,
+            telegramId: response.telegram_id,
           });
         } catch (error: any) {
           set({
@@ -112,6 +142,11 @@ export const useAuthStore = create<AuthState>()(
 
       setTelegramId: (id: number | null) => {
         set({ telegramId: id });
+      },
+
+      checkTelegramAvailability: () => {
+        const available = isTelegramWebApp();
+        set({ isTelegramAvailable: available });
       },
 
       checkAuth: async () => {

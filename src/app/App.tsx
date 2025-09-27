@@ -37,7 +37,7 @@ export function App() {
               
               // Try to login with Telegram
               try {
-                await telegramLogin(telegramUser);
+                await telegramLogin();
               } catch (error) {
                 console.log('Telegram login failed, user needs to register or login manually');
               }

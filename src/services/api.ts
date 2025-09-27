@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { extractTelegramIdFromInitData } from '@/utils/telegram';
 
 const API_BASE_URL = 'https://dem-p8gd.onrender.com';
 
@@ -113,6 +114,12 @@ export const authAPI = {
     
     if (telegramInitData) {
       headers['X-Telegram-Init-Data'] = telegramInitData;
+      
+      // Extract telegram_id from init data and add it to headers
+      const telegramId = extractTelegramIdFromInitData(telegramInitData);
+      if (telegramId) {
+        headers['X-Telegram-User-Id'] = telegramId.toString();
+      }
     }
     
     const response = await api.post('/auth/login', credentials, { headers });
@@ -139,6 +146,12 @@ export const authAPI = {
     
     if (telegramInitData) {
       headers['X-Telegram-Init-Data'] = telegramInitData;
+      
+      // Extract telegram_id from init data and add it to headers
+      const telegramId = extractTelegramIdFromInitData(telegramInitData);
+      if (telegramId) {
+        headers['X-Telegram-User-Id'] = telegramId.toString();
+      }
     }
     
     const response = await api.post('/auth/login', formData, { headers });

@@ -152,6 +152,23 @@ export function getTelegramUserId(): number | null {
 }
 
 /**
+ * Extract telegram_id from Telegram Init Data
+ */
+export function extractTelegramIdFromInitData(initData: string): number | null {
+  try {
+    const urlParams = new URLSearchParams(initData);
+    const userParam = urlParams.get('user');
+    if (userParam) {
+      const user = JSON.parse(userParam);
+      return user.id || null;
+    }
+  } catch (error) {
+    console.warn('Failed to extract telegram_id from init data:', error);
+  }
+  return null;
+}
+
+/**
  * Check if Telegram user is available
  */
 export function hasTelegramUser(): boolean {

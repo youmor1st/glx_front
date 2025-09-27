@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Section, Title, Text, Input, FormItem } from '@telegram-apps/telegram-ui';
+import { Button, Section, Title, Text, Input } from '@telegram-apps/telegram-ui';
 import { adminAPI, type StudentCreate, type StudentProfile, type User } from '@/services/api';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -21,7 +21,6 @@ interface StudentManagementProps {
 
 export function StudentManagement({ onBack }: StudentManagementProps) {
   const [students, setStudents] = useState<{ [className: string]: User[] }>({});
-  const [classes, setClasses] = useState<string[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -185,7 +184,7 @@ export function StudentManagement({ onBack }: StudentManagementProps) {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <FormItem>
+            <div>
               <Input
                 {...register('username')}
                 placeholder="Имя пользователя"
@@ -196,9 +195,9 @@ export function StudentManagement({ onBack }: StudentManagementProps) {
                   {errors.username.message}
                 </Text>
               )}
-            </FormItem>
+            </div>
 
-            <FormItem>
+            <div>
               <Input
                 {...register('password')}
                 type="password"
@@ -210,9 +209,9 @@ export function StudentManagement({ onBack }: StudentManagementProps) {
                   {errors.password.message}
                 </Text>
               )}
-            </FormItem>
+            </div>
 
-            <FormItem>
+            <div>
               <Input
                 {...register('first_name')}
                 placeholder="Имя"
@@ -223,17 +222,17 @@ export function StudentManagement({ onBack }: StudentManagementProps) {
                   {errors.first_name.message}
                 </Text>
               )}
-            </FormItem>
+            </div>
 
-            <FormItem>
+            <div>
               <Input
                 {...register('last_name')}
                 placeholder="Фамилия (необязательно)"
                 style={{ background: 'rgba(255,255,255,0.1)', color: '#FFFFFF' }}
               />
-            </FormItem>
+            </div>
 
-            <FormItem>
+            <div>
               <select
                 {...register('class_name')}
                 style={{
@@ -258,7 +257,7 @@ export function StudentManagement({ onBack }: StudentManagementProps) {
                   {errors.class_name.message}
                 </Text>
               )}
-            </FormItem>
+            </div>
 
             {error && (
               <Text style={{ color: '#FF3B30', textAlign: 'center', marginBottom: '8px' }}>

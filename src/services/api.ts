@@ -155,6 +155,11 @@ export const authAPI = {
       
       if (telegramId) {
         headers['X-Telegram-User-Id'] = telegramId.toString();
+        headers['telegram_id'] = telegramId.toString();
+        headers['X-Telegram-ID'] = telegramId.toString();
+        
+        // Also add telegram_id to form data
+        formData.append('telegram_id', telegramId.toString());
       }
     }
     

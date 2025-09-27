@@ -42,6 +42,11 @@ export const useAuthStore = create<AuthState>()(
           console.log('🔍 Telegram Init Data:', telegramInitData);
           console.log('🔍 Is Telegram WebApp available:', isTelegramWebApp());
           
+          // If no Telegram data available, show warning but continue
+          if (!telegramInitData) {
+            console.warn('⚠️ No Telegram Init Data available - login without Telegram binding');
+          }
+          
           const response: AuthResponse = await authAPI.loginForm(
             { username, password },
             telegramInitData || undefined

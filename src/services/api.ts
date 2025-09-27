@@ -203,10 +203,67 @@ export const teachersAPI = {
   },
 };
 
+export interface StudentCreate {
+  username: string;
+  password: string;
+  first_name: string;
+  last_name?: string;
+  class_name: string;
+  telegram_id?: number | null;
+}
+
+export interface StudentProfile {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name?: string;
+  class_name: string;
+  telegram_id?: number;
+  points: number;
+  status: string;
+  created_at: string;
+}
+
 export const adminAPI = {
   // Get all students (admin view)
   getAllStudents: async (): Promise<User[]> => {
     const response = await api.get('/admin/students');
+    return response.data;
+  },
+
+  // Get students by class
+  getStudentsByClass: async (className: string): Promise<User[]> => {
+    const response = await api.get(`/admin/students/class/${encodeURIComponent(className)}`);
+    return response.data;
+  },
+
+  // Get all classes
+  getClasses: async (): Promise<string[]> => {
+    const response = await api.get('/admin/classes');
+    return response.data;
+  },
+
+  // Get student profile by ID
+  getStudentProfile: async (id: number): Promise<StudentProfile> => {
+    const response = await api.get(`/admin/students/${id}`);
+    return response.data;
+  },
+
+  // Create new student
+  createStudent: async (studentData: StudentCreate): Promise<StudentProfile> => {
+    const response = await api.post('/admin/students', studentData);
+    return response.data;
+  },
+
+  // Update student
+  updateStudent: async (id: number, studentData: Partial<StudentCreate>): Promise<StudentProfile> => {
+    const response = await api.put(`/admin/students/${id}`, studentData);
+    return response.data;
+  },
+
+  // Delete student
+  deleteStudent: async (id: number): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete(`/admin/students/${id}`);
     return response.data;
   },
 

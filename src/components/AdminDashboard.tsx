@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Button, Section, Title, Text } from '@telegram-apps/telegram-ui';
 import { useAuthStore } from '@/store/authStore';
 import { adminAPI, type PointHistory } from '@/services/api';
+import { StudentManagement } from './StudentManagement';
 
 export function AdminDashboard() {
   const { user, logout } = useAuthStore();
   const [pointHistory, setPointHistory] = useState<PointHistory[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'students'>('dashboard');
 
   useEffect(() => {
     loadData();
@@ -43,6 +45,18 @@ export function AdminDashboard() {
     logout();
   };
 
+  const handleManageStudents = () => {
+    setCurrentView('students');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
+  };
+
+  if (currentView === 'students') {
+    return <StudentManagement onBack={handleBackToDashboard} />;
+  }
+
   return (
     <div style={{ padding: '16px' }}>
       {/* Admin Info */}
@@ -70,7 +84,11 @@ export function AdminDashboard() {
       {/* Admin Actions */}
       <Section header="Управление">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Button size="l" style={{ background: 'rgba(0, 122, 255, 0.2)', color: '#007AFF' }}>
+          <Button 
+            size="l" 
+            onClick={handleManageStudents}
+            style={{ background: 'rgba(0, 122, 255, 0.2)', color: '#007AFF' }}
+          >
             Управление студентами
           </Button>
           <Button size="l" style={{ background: 'rgba(52, 199, 89, 0.2)', color: '#34C759' }}>

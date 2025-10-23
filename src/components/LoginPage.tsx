@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Text } from '@telegram-apps/telegram-ui';
 import { useAuthStore } from '@/store/authStore';
-import { getTelegramUser, isTelegramWebApp, initTelegramWebApp } from '@/utils/telegram';
+import { getTelegramUser, getTelegramInitData, isTelegramWebApp, initTelegramWebApp } from '@/utils/telegram';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Введите имя пользователя'),
@@ -42,6 +42,8 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
   });
 
   useEffect(() => {
+    console.log('🔍 === LOGIN PAGE INITIALIZATION ===');
+    
     // Initialize Telegram WebApp
     initTelegramWebApp();
     
@@ -50,21 +52,43 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
     
     // Get Telegram user data
     const user = getTelegramUser();
+    const isTelegram = isTelegramWebApp();
+    const initData = getTelegramInitData();
+    
+    console.log('🔍 Is Telegram WebApp:', isTelegram);
+    console.log('🔍 Telegram user:', user);
+    console.log('🔍 Telegram initData:', initData);
+    console.log('🔍 InitData length:', initData?.length || 0);
+    
     setTelegramUser(user);
     
     // Auto-attempt quick login first if in Telegram WebApp
-    if (isTelegramWebApp() && user) {
+    if (isTelegram && user) {
+      console.log('🔍 Attempting quick login...');
       attemptQuickLogin();
-    } else if (!isTelegramWebApp()) {
+    } else if (!isTelegram) {
+      console.log('🔍 Not in Telegram WebApp, setting JSON mode');
       // If not in Telegram WebApp, default to JSON login mode
       setLoginMode('json');
+    } else {
+      console.log('🔍 In Telegram WebApp but no user data, setting first-time mode');
+      setLoginMode('first-time');
     }
+    
+    console.log('🔍 === END LOGIN PAGE INITIALIZATION ===');
   }, [checkTelegramAvailability]);
 
   const attemptQuickLogin = async () => {
     try {
       setIsCheckingQuickLogin(true);
       clearError();
+      
+      console.log('🔍 === ATTEMPTING QUICK LOGIN ===');
+      console.log('🔍 Is Telegram WebApp:', isTelegramWebApp());
+      console.log('🔍 Telegram user:', getTelegramUser());
+      console.log('🔍 Telegram initData:', getTelegramInitData());
+      console.log('🔍 === END QUICK LOGIN ATTEMPT ===');
+      
       await quickLogin();
       onSuccess();
     } catch (error) {
@@ -79,9 +103,21 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
   const onSubmit = async (data: LoginFormData) => {
     try {
       clearError();
+      
+      console.log('🔍 === LOGIN FORM SUBMIT ===');
+      console.log('🔍 Login mode:', loginMode);
+      console.log('🔍 Is Telegram WebApp:', isTelegramWebApp());
+      console.log('🔍 Telegram user:', getTelegramUser());
+      console.log('🔍 Telegram initData:', getTelegramInitData());
+      console.log('🔍 Username:', data.username);
+      console.log('🔍 Password:', data.password);
+      console.log('🔍 === END LOGIN FORM SUBMIT ===');
+      
       if (loginMode === 'json') {
+        console.log('🔍 Using loginJson method');
         await loginJson(data.username, data.password);
       } else {
+        console.log('🔍 Using smart login method');
         // Use smart login that automatically chooses the right endpoint
         await login(data.username, data.password);
       }

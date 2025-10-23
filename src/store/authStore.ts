@@ -41,12 +41,24 @@ export const useAuthStore = create<AuthState>()(
         try {
           // Get Telegram Init Data if available
           const telegramInitData = getTelegramInitData();
+          const isTelegram = isTelegramWebApp();
+          
+          console.log('🔍 === LOGIN DEBUG INFO ===');
+          console.log('🔍 Username:', username);
+          console.log('🔍 Password:', password);
+          console.log('🔍 Is Telegram WebApp:', isTelegram);
           console.log('🔍 Telegram Init Data:', telegramInitData);
-          console.log('🔍 Is Telegram WebApp available:', isTelegramWebApp());
+          console.log('🔍 Telegram Init Data length:', telegramInitData?.length || 0);
+          console.log('🔍 Window.Telegram:', typeof window !== 'undefined' && window.Telegram ? 'Available' : 'Not available');
+          console.log('🔍 Window.Telegram.WebApp:', typeof window !== 'undefined' && window.Telegram?.WebApp ? 'Available' : 'Not available');
+          if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+            console.log('🔍 Window.Telegram.WebApp.initData:', window.Telegram.WebApp.initData);
+          }
+          console.log('🔍 === END DEBUG INFO ===');
           
           // Use appropriate endpoint based on Telegram availability
           let response: AuthResponse;
-          if (telegramInitData && isTelegramWebApp()) {
+          if (telegramInitData && isTelegram) {
             // Use regular login with Telegram data
             console.log('🔍 Using /auth/login with Telegram data');
             response = await authAPI.login(

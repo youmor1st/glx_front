@@ -112,20 +112,33 @@ export const authAPI = {
     
     if (telegramInitData) {
       // Use /auth/login with Telegram data
+      console.log('🔍 Using /auth/login with Telegram data');
+      console.log('🔍 Telegram Init Data:', telegramInitData);
+      
+      // Send as form data with initData in body
+      const formData = new URLSearchParams();
+      formData.append('username', credentials.username);
+      formData.append('password', credentials.password);
+      formData.append('initData', telegramInitData);
+      
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       };
       
+      // Also add to headers for backward compatibility
       headers['X-Telegram-Init-Data'] = telegramInitData;
       
       // Extract telegram_id from init data and add it to headers
       const telegramId = extractTelegramIdFromInitData(telegramInitData);
       if (telegramId) {
         headers['X-Telegram-User-Id'] = telegramId.toString();
+        formData.append('telegram_id', telegramId.toString());
       }
       
-      console.log('🔍 Using /auth/login with Telegram data');
-      const response = await api.post('/auth/login', credentials, { headers });
+      console.log('🔍 Form data:', formData.toString());
+      console.log('🔍 Headers:', headers);
+      
+      const response = await api.post('/auth/login', formData, { headers });
       return response.data;
     } else {
       // Use /auth/login-json without Telegram data
@@ -136,22 +149,35 @@ export const authAPI = {
 
   // Quick login with Telegram Init Data only (for already linked users)
   quickLogin: async (telegramInitData?: string): Promise<AuthResponse> => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+    console.log('🔍 API.quickLogin called with:', { hasTelegramData: !!telegramInitData });
     
     if (telegramInitData) {
+      // Send as form data with initData in body
+      const formData = new URLSearchParams();
+      formData.append('initData', telegramInitData);
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      };
+      
+      // Also add to headers for backward compatibility
       headers['X-Telegram-Init-Data'] = telegramInitData;
       
       // Extract telegram_id from init data and add it to headers
       const telegramId = extractTelegramIdFromInitData(telegramInitData);
       if (telegramId) {
         headers['X-Telegram-User-Id'] = telegramId.toString();
+        formData.append('telegram_id', telegramId.toString());
       }
+      
+      console.log('🔍 Quick login form data:', formData.toString());
+      console.log('🔍 Quick login headers:', headers);
+      
+      const response = await api.post('/auth/quick', formData, { headers });
+      return response.data;
+    } else {
+      throw new Error('Telegram Init Data is required for quick login');
     }
-    
-    const response = await api.post('/auth/quick', {}, { headers });
-    return response.data;
   },
 
   // Login with validated Telegram initData

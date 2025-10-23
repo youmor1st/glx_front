@@ -3,9 +3,10 @@ import { Button, Text } from '@telegram-apps/telegram-ui';
 interface HomePageProps {
   onAdminRegistration: () => void;
   onLogin: () => void;
+  onLoginDemo: () => void;
 }
 
-export function HomePage({ onAdminRegistration, onLogin }: HomePageProps) {
+export function HomePage({ onAdminRegistration, onLogin, onLoginDemo }: HomePageProps) {
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -64,6 +65,31 @@ export function HomePage({ onAdminRegistration, onLogin }: HomePageProps) {
             </Text>
             <Text style={{ color: 'rgba(199, 199, 240, 0.8)', fontSize: '14px' }}>
               Войти с существующим аккаунтом
+            </Text>
+          </div>
+        </Button>
+
+        {/* Login Demo Button */}
+        <Button
+          onClick={onLoginDemo}
+          style={{
+            background: 'rgba(255, 193, 7, 0.2)',
+            color: '#FFC107',
+            border: '2px solid #FFC107',
+            borderRadius: '12px',
+            padding: '20px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <Text style={{ color: '#FFC107', fontSize: '16px', fontWeight: '600' }}>
+              Демо входа
+            </Text>
+            <Text style={{ color: 'rgba(255, 193, 7, 0.8)', fontSize: '14px' }}>
+              Тестирование различных методов входа
             </Text>
           </div>
         </Button>

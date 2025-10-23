@@ -13,7 +13,9 @@ interface AuthState {
   
   // Actions
   login: (username: string, password: string) => Promise<void>;
+  quickLogin: () => Promise<void>;
   telegramLogin: () => Promise<void>;
+  loginJson: (username: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: User) => void;
   setLoading: (loading: boolean) => void;
@@ -81,6 +83,45 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      quickLogin: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const telegramInitData = getTelegramInitData();
+          if (!telegramInitData) {
+            throw new Error('Telegram Init Data не доступен для быстрого входа');
+          }
+          
+          const response: AuthResponse = await authAPI.quickLogin(telegramInitData);
+          
+          // Store token
+          localStorage.setItem('access_token', response.access_token);
+          
+          // Create user object from response
+          const user: User = {
+            id: response.user_id,
+            username: response.username,
+            first_name: response.first_name,
+            last_name: response.last_name,
+            telegram_id: response.telegram_id,
+            role: response.role,
+          };
+          
+          set({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            telegramId: response.telegram_id,
+          });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.message || 'Ошибка быстрого входа',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
       telegramLogin: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -114,6 +155,40 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             error: error.response?.data?.message || 'Ошибка входа через Telegram',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      loginJson: async (username: string, password: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response: AuthResponse = await authAPI.loginJson({ username, password });
+          
+          // Store token
+          localStorage.setItem('access_token', response.access_token);
+          
+          // Create user object from response
+          const user: User = {
+            id: response.user_id,
+            username: response.username,
+            first_name: response.first_name,
+            last_name: response.last_name,
+            telegram_id: response.telegram_id,
+            role: response.role,
+          };
+          
+          set({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            telegramId: response.telegram_id,
+          });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.message || 'Ошибка входа',
             isLoading: false,
           });
           throw error;

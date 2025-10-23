@@ -5,11 +5,12 @@ import { useAuthStore } from "@/store/authStore";
 import { HomePage } from "@/components/HomePage";
 import { AdminRegistration } from "@/components/AdminRegistration";
 import { LoginPage } from "@/components/LoginPage";
+import { LoginDemo } from "@/components/LoginDemo";
 import { StudentDashboard } from "@/components/StudentDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
-import { isTelegramWebApp, initTelegramWebApp } from "@/utils/telegram";
+import { initTelegramWebApp } from "@/utils/telegram";
 
-type AppPage = 'home' | 'admin-registration' | 'login' | 'dashboard';
+type AppPage = 'home' | 'admin-registration' | 'login' | 'login-demo' | 'dashboard';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
@@ -28,15 +29,6 @@ export function App() {
       
       // First check if user is already authenticated
       await checkAuth();
-      
-      // If not authenticated, try Telegram login
-      if (!isAuthenticated && isTelegramWebApp()) {
-        try {
-          await telegramLogin();
-        } catch (error) {
-          console.log('Telegram login failed, user needs to register or login manually');
-        }
-      }
       
       setIsInitialized(true);
     };
@@ -61,6 +53,10 @@ export function App() {
 
   const handleLogin = () => {
     setCurrentPage('login');
+  };
+
+  const handleLoginDemo = () => {
+    setCurrentPage('login-demo');
   };
 
   const handleBackToHome = () => {
@@ -139,6 +135,7 @@ export function App() {
             <HomePage 
               onAdminRegistration={handleAdminRegistration}
               onLogin={handleLogin}
+              onLoginDemo={handleLoginDemo}
             />
           )}
           {currentPage === 'admin-registration' && (
@@ -149,6 +146,9 @@ export function App() {
           )}
           {currentPage === 'login' && (
             <LoginPage onSuccess={handleLoginSuccess} />
+          )}
+          {currentPage === 'login-demo' && (
+            <LoginDemo />
           )}
           {currentPage === 'dashboard' && (
             user?.role === 'admin' ? <AdminDashboard /> : <StudentDashboard />

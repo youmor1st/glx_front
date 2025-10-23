@@ -81,12 +81,9 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
       clearError();
       if (loginMode === 'json') {
         await loginJson(data.username, data.password);
-      } else if (loginMode === 'first-time' && isTelegramWebApp()) {
-        // Use regular login with Telegram data for first-time users in Telegram
-        await login(data.username, data.password);
       } else {
-        // Use JSON login for non-Telegram environments or when no Telegram data available
-        await loginJson(data.username, data.password);
+        // Use smart login that automatically chooses the right endpoint
+        await login(data.username, data.password);
       }
       onSuccess();
     } catch (error) {

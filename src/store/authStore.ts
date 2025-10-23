@@ -48,13 +48,14 @@ export const useAuthStore = create<AuthState>()(
           let response: AuthResponse;
           if (telegramInitData && isTelegramWebApp()) {
             // Use regular login with Telegram data
-            response = await authAPI.loginForm(
+            console.log('🔍 Using /auth/login with Telegram data');
+            response = await authAPI.login(
               { username, password },
               telegramInitData
             );
           } else {
             // Use JSON login without Telegram data
-            console.log('⚠️ No Telegram data available - using JSON login');
+            console.log('⚠️ No Telegram data available - using /auth/login-json');
             response = await authAPI.loginJson({ username, password });
           }
           

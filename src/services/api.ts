@@ -108,11 +108,14 @@ export interface PointHistory {
 export const authAPI = {
   // First-time login with username/password + telegram_id linking
   login: async (credentials: LoginCredentials, telegramInitData?: string): Promise<AuthResponse> => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+    console.log('🔍 API.login called with:', { hasTelegramData: !!telegramInitData });
     
     if (telegramInitData) {
+      // Use /auth/login with Telegram data
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
       headers['X-Telegram-Init-Data'] = telegramInitData;
       
       // Extract telegram_id from init data and add it to headers
@@ -120,10 +123,15 @@ export const authAPI = {
       if (telegramId) {
         headers['X-Telegram-User-Id'] = telegramId.toString();
       }
+      
+      console.log('🔍 Using /auth/login with Telegram data');
+      const response = await api.post('/auth/login', credentials, { headers });
+      return response.data;
+    } else {
+      // Use /auth/login-json without Telegram data
+      console.log('🔍 Using /auth/login-json without Telegram data');
+      return await authAPI.loginJson(credentials);
     }
-    
-    const response = await api.post('/auth/login', credentials, { headers });
-    return response.data;
   },
 
   // Quick login with Telegram Init Data only (for already linked users)

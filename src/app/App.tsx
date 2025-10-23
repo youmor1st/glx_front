@@ -6,11 +6,12 @@ import { HomePage } from "@/components/HomePage";
 import { AdminRegistration } from "@/components/AdminRegistration";
 import { LoginPage } from "@/components/LoginPage";
 import { LoginDemo } from "@/components/LoginDemo";
+import { TelegramDebug } from "@/components/TelegramDebug";
 import { StudentDashboard } from "@/components/StudentDashboard";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { initTelegramWebApp } from "@/utils/telegram";
 
-type AppPage = 'home' | 'admin-registration' | 'login' | 'login-demo' | 'dashboard';
+type AppPage = 'home' | 'admin-registration' | 'login' | 'login-demo' | 'telegram-debug' | 'dashboard';
 
 export function App() {
   const lp = useMemo(() => retrieveLaunchParams(), []);
@@ -23,6 +24,13 @@ export function App() {
     const initializeAuth = async () => {
       // Initialize Telegram WebApp
       initTelegramWebApp();
+      
+      // Log Telegram WebApp info for debugging
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+        console.log('✅ Telegram WebApp initialized');
+        console.log('✅ Telegram initData:', window.Telegram.WebApp.initData);
+        console.log('✅ Telegram user:', window.Telegram.WebApp.initDataUnsafe?.user);
+      }
       
       // Check Telegram availability
       checkTelegramAvailability();
@@ -57,6 +65,10 @@ export function App() {
 
   const handleLoginDemo = () => {
     setCurrentPage('login-demo');
+  };
+
+  const handleTelegramDebug = () => {
+    setCurrentPage('telegram-debug');
   };
 
   const handleBackToHome = () => {
@@ -136,6 +148,7 @@ export function App() {
               onAdminRegistration={handleAdminRegistration}
               onLogin={handleLogin}
               onLoginDemo={handleLoginDemo}
+              onTelegramDebug={handleTelegramDebug}
             />
           )}
           {currentPage === 'admin-registration' && (
@@ -149,6 +162,9 @@ export function App() {
           )}
           {currentPage === 'login-demo' && (
             <LoginDemo />
+          )}
+          {currentPage === 'telegram-debug' && (
+            <TelegramDebug />
           )}
           {currentPage === 'dashboard' && (
             user?.role === 'admin' ? <AdminDashboard /> : <StudentDashboard />

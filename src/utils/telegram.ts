@@ -134,6 +134,13 @@ export function getTelegramInitData(): string | null {
   const webApp = getTelegramWebApp();
   console.log('🔍 getTelegramInitData - webApp:', webApp);
   console.log('🔍 getTelegramInitData - initData:', webApp?.initData);
+  
+  // Also try to get initData directly from window.Telegram.WebApp
+  if (!webApp?.initData && typeof window !== 'undefined' && window.Telegram?.WebApp?.initData) {
+    console.log('🔍 Fallback to window.Telegram.WebApp.initData:', window.Telegram.WebApp.initData);
+    return window.Telegram.WebApp.initData;
+  }
+  
   return webApp?.initData || null;
 }
 
@@ -186,10 +193,14 @@ export function hasTelegramUser(): boolean {
  * Initialize Telegram WebApp
  */
 export function initTelegramWebApp(): void {
-  const webApp = getTelegramWebApp();
-  if (webApp) {
-    webApp.ready();
-    webApp.expand();
+  if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+    console.log('🚀 Initializing Telegram WebApp...');
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+    console.log('✅ Telegram WebApp ready and expanded');
+    console.log('📋 InitData:', window.Telegram.WebApp.initData);
+  } else {
+    console.log('⚠️ Telegram WebApp not available');
   }
 }
 

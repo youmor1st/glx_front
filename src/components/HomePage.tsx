@@ -4,9 +4,10 @@ interface HomePageProps {
   onAdminRegistration: () => void;
   onLogin: () => void;
   onLoginDemo: () => void;
+  onTelegramDebug: () => void;
 }
 
-export function HomePage({ onAdminRegistration, onLogin, onLoginDemo }: HomePageProps) {
+export function HomePage({ onAdminRegistration, onLogin, onLoginDemo, onTelegramDebug }: HomePageProps) {
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -90,6 +91,31 @@ export function HomePage({ onAdminRegistration, onLogin, onLoginDemo }: HomePage
             </Text>
             <Text style={{ color: 'rgba(255, 193, 7, 0.8)', fontSize: '14px' }}>
               Тестирование различных методов входа
+            </Text>
+          </div>
+        </Button>
+
+        {/* Telegram Debug Button */}
+        <Button
+          onClick={onTelegramDebug}
+          style={{
+            background: 'rgba(255, 87, 34, 0.2)',
+            color: '#FF5722',
+            border: '2px solid #FF5722',
+            borderRadius: '12px',
+            padding: '20px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <Text style={{ color: '#FF5722', fontSize: '16px', fontWeight: '600' }}>
+              Telegram Debug
+            </Text>
+            <Text style={{ color: 'rgba(255, 87, 34, 0.8)', fontSize: '14px' }}>
+              Отладка Telegram WebApp данных
             </Text>
           </div>
         </Button>

@@ -44,15 +44,19 @@ export const useAuthStore = create<AuthState>()(
           console.log('🔍 Telegram Init Data:', telegramInitData);
           console.log('🔍 Is Telegram WebApp available:', isTelegramWebApp());
           
-          // If no Telegram data available, show warning but continue
-          if (!telegramInitData) {
-            console.warn('⚠️ No Telegram Init Data available - login without Telegram binding');
+          // Use appropriate endpoint based on Telegram availability
+          let response: AuthResponse;
+          if (telegramInitData && isTelegramWebApp()) {
+            // Use regular login with Telegram data
+            response = await authAPI.loginForm(
+              { username, password },
+              telegramInitData
+            );
+          } else {
+            // Use JSON login without Telegram data
+            console.log('⚠️ No Telegram data available - using JSON login');
+            response = await authAPI.loginJson({ username, password });
           }
-          
-          const response: AuthResponse = await authAPI.loginForm(
-            { username, password },
-            telegramInitData || undefined
-          );
           
           // Store token
           localStorage.setItem('access_token', response.access_token);

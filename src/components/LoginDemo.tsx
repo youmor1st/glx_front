@@ -28,6 +28,11 @@ export function LoginDemo() {
       clearError();
       setShowResults(true);
       
+      console.log(`🔍 Attempting ${type} login...`);
+      console.log(`🔍 Is Telegram WebApp: ${isTelegramWebApp()}`);
+      console.log(`🔍 Telegram User:`, telegramUser);
+      console.log(`🔍 Init Data:`, initData ? 'Available' : 'None');
+      
       switch (type) {
         case 'first-time':
           await login(username, password);

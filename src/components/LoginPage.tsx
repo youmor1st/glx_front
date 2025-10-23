@@ -55,6 +55,9 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
     // Auto-attempt quick login first if in Telegram WebApp
     if (isTelegramWebApp() && user) {
       attemptQuickLogin();
+    } else if (!isTelegramWebApp()) {
+      // If not in Telegram WebApp, default to JSON login mode
+      setLoginMode('json');
     }
   }, [checkTelegramAvailability]);
 
@@ -78,8 +81,12 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
       clearError();
       if (loginMode === 'json') {
         await loginJson(data.username, data.password);
-      } else {
+      } else if (loginMode === 'first-time' && isTelegramWebApp()) {
+        // Use regular login with Telegram data for first-time users in Telegram
         await login(data.username, data.password);
+      } else {
+        // Use JSON login for non-Telegram environments or when no Telegram data available
+        await loginJson(data.username, data.password);
       }
       onSuccess();
     } catch (error) {
@@ -372,14 +379,16 @@ export function LoginPage({ onSuccess }: LoginPageProps) {
 
       {!isCheckingQuickLogin && (
         <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <p style={{ color: '#9EA0C8', fontSize: '12px' }}>
-            {loginMode === 'first-time' && isTelegramWebApp()
-              ? 'После первого входа ваш Telegram ID будет привязан к аккаунту'
-              : loginMode === 'quick'
-              ? 'Быстрый вход доступен только для уже привязанных аккаунтов'
-              : 'Войдите с помощью имени пользователя и пароля'
-            }
-          </p>
+        <p style={{ color: '#9EA0C8', fontSize: '12px' }}>
+          {loginMode === 'first-time' && isTelegramWebApp()
+            ? 'После первого входа ваш Telegram ID будет привязан к аккаунту'
+            : loginMode === 'quick'
+            ? 'Быстрый вход доступен только для уже привязанных аккаунтов'
+            : loginMode === 'json'
+            ? 'Вход без привязки Telegram (для администраторов или тестирования)'
+            : 'Войдите с помощью имени пользователя и пароля'
+          }
+        </p>
         </div>
       )}
     </div>
